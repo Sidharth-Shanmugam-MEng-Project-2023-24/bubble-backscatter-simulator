@@ -128,9 +128,10 @@ if __name__ == "__main__":
             # If this bubble has not been previously tracked...
             if bubble.id not in bubble_positions:
                 # ... Initialise an empty list to track in subsequent frames
-                bubble_positions[bubble.id] = []
+                bubble_positions[bubble.id] = {'positions': [], 'radius': []}
             # Append the list with the bubble's position in this frame
-            bubble_positions[bubble.id].append((bubble.x, bubble.y))
+            bubble_positions[bubble.id]['positions'].append((bubble.x, bubble.y))
+            bubble_positions[bubble.id]['radius'].append(bubble.radius)
 
         # Update and draw bubbles
         for bubble in bubbles:
@@ -166,13 +167,14 @@ if __name__ == "__main__":
     # Generate CSV dataset of simulated bubble positions
     export_filename_csv = export_filename_generic + ".csv"
 
-    with open(export_filename_csv, mode='x', newline='') as file:
+    with open(export_filename_csv, mode='w', newline='') as file:
         writer = csv.writer(file)
         # Write header
-        writer.writerow(['Bubble ID', 'Frame #', 'X Position', 'Y Position'])
-        # Write bubble positions
-        for bubble_id, positions in bubble_positions.items():
-            for frame, (x, y) in enumerate(positions):
-                writer.writerow([bubble_id, frame, x, y])
+        writer.writerow(['Bubble ID', 'Frame #', 'X Position', 'Y Position', 'Radius'])
+        # Write bubble positions and radius
+        for bubble_id, data in bubble_positions.items():
+            for frame, (x, y) in enumerate(data['positions']):
+                radius = data['radius'][frame]
+                writer.writerow([bubble_id, frame, x, y, radius])
 
     pygame.quit()
